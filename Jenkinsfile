@@ -1,10 +1,13 @@
 pipeline {
  agent any
+ tools{
+   maven 'Maven 3.9.6'
+ }
  stages {
-   stage("one"){
+   stage("build"){
      steps{
-       echo 'step 1'
-	   sleep 3
+       echo 'Compiling sysfoo app'
+	   sh 'mvn compile'
     }
    }
    stage("two"){
