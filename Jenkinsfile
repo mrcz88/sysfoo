@@ -1,5 +1,15 @@
 pipeline {
  agent any
+
+ parameters {
+   booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip Maven tests')
+ }
+
+ environment {
+  APP_NAME = 'my-java-app'
+  MAVEN_OPTS = '-Xmx512m'
+ }
+	
  tools{
    maven 'Maven 3.9.6'
  }
@@ -10,22 +20,34 @@ pipeline {
 	   sh 'mvn compile'
     }
    }
-   stage("two"){
-     steps{
-       echo 'step 2'
-       sleep 9
-     }
-   }
-   stage("three"){
-     steps{
-       echo 'step 3'
-       sleep 5
-     }
-   }
+	stage('Test') {
+		when {
+			expression { return !params.SKIP_TESTS }
+		}
+		steps {
+			timeout(time: 5, unit: 'MINUTES') {
+				retry(2) {
+					sh 'mvn test'
+				}
+			}
+		}
+	}
+	stage('Package') {
+		steps {
+			sh 'mvn package -DskipTests'
+		}
+	}
  }
  post {
-   always {
-     echo 'This pipeline is completed..'
-   }
+	always {
+		echo 'Pipeline finished'
+		junit 'target/surefire-reports/*.xml'
+	}
+	success {
+		echo 'Build successful'
+	}
+	failure {
+		echo 'Build failed'
+	}
  }
 }
