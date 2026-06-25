@@ -1,10 +1,15 @@
+/* non e' una scripted pipeline. La scripted pipeline comincia con node {
+   ed è codificata in Groovy
+*/
+
+/* DECLARATIVE PIPELINE */
 pipeline {
  agent any
-
+ /* parameter */
  parameters {
    booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip Maven tests')
  }
-
+  
  environment {
   APP_NAME = 'my-java-app'
   MAVEN_OPTS = '-Xmx512m'
@@ -13,6 +18,8 @@ pipeline {
  tools{
    maven 'Maven 3.9.6'
  }
+
+ /* all stages of the pipeline */
  stages {
    stage("build"){
      steps{
