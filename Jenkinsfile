@@ -2,6 +2,8 @@
    ed è codificata in Groovy
 */
 
+/* PATS = pipeline, agent, tools, stages
+*/
 /* DECLARATIVE PIPELINE */
 pipeline {
  agent any
