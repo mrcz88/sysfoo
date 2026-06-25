@@ -16,7 +16,10 @@ pipeline {
   APP_NAME = 'my-java-app'
   MAVEN_OPTS = '-Xmx512m'
  }
-	
+
+ /* manage jenkins> tools> maven installation> metti stesso nome che usi qua 
+    cioè ( Maven 3.9.6 )
+  */	
  tools{
    maven 'Maven 3.9.6'
  }
