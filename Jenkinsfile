@@ -2,7 +2,7 @@
    ed è codificata in Groovy
 */
 
-/* PATS = pipeline, agent, tools, stages
+/* PATSP = pipeline, agent, tools, stages, post
 */
 /* DECLARATIVE PIPELINE */
 pipeline {
