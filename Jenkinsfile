@@ -27,7 +27,12 @@ pipeline {
     environment {
         IMAGE_NAME = "${params.DOCKERHUB_USER}/sysfoo"
     }
-
+ /* manage jenkins> tools> maven installation> metti stesso nome che usi qua 
+    cioè ( Maven 3.9.6 )
+  */
+ tools{
+   maven 'Maven 3.9.6'
+ }
     stages {
         stage('Checkout') {
             steps {
