@@ -40,6 +40,17 @@ pipeline {
             }
         }
 
+        stage('Start') {
+            steps {
+                publishChecks(
+                    name: 'jenkins/ci',
+                    title: 'Jenkins CI',
+                    summary: 'Build avviata da Jenkins.',
+                    status: 'IN_PROGRESS'
+                )
+            }
+        }
+
         stage('Build') {
             steps {
                 // Solo compilazione: fallisce in fretta su errori di sintassi
@@ -111,9 +122,25 @@ pipeline {
 
     post {
         success {
+            publishChecks(
+                name: 'jenkins/ci',
+                title: 'Jenkins CI',
+                summary: 'Build completata con successo.',
+                status: 'COMPLETED',
+                conclusion: 'SUCCESS',
+                detailsURL: env.BUILD_URL
+            )
             echo 'Pipeline completata'
         }
         failure {
+            publishChecks(
+                name: 'jenkins/ci',
+                title: 'Jenkins CI',
+                summary: 'Build fallita.',
+                status: 'COMPLETED',
+                conclusion: 'FAILURE',
+                detailsURL: env.BUILD_URL
+            )
             echo 'Pipeline fallita'
         }
         always {
