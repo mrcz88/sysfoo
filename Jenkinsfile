@@ -4,13 +4,9 @@ pipeline {
     options {
         // Aggiunge il timestamp alle righe della console output della pipeline
         timestamps()
-        // Tutta la pipeline ha un timeout di 30 minuti
+        /* Tutta la pipeline ha un timeout di 30 minuti */
         timeout(time: 30, unit: 'MINUTES')
         disableConcurrentBuilds()
-    }
-
-    environment {
-        IMAGE_NAME = 'registry.example.com/sysfoo'
     }
 
     parameters {
@@ -19,18 +15,28 @@ pipeline {
             defaultValue: false,
             description: 'Skip unit tests'
         )
+        string(
+            name: 'DOCKERHUB_USER',
+            defaultValue: 'your-dockerhub-username',
+            description: 'Username Docker Hub (es. mariorossi → mariorossi/sysfoo)'
+        )
+    }
+
+    environment {
+        IMAGE_NAME = "${params.DOCKERHUB_USER}/sysfoo"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                checkout scm // Checkout the source code from the repository
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                // Solo compilazione: fallisce in fretta su errori di sintassi
+                sh 'mvn clean compile -DskipTests'
             }
         }
 
@@ -53,6 +59,13 @@ pipeline {
             }
         }
 
+        stage('Package') {
+            steps {
+                // Crea il JAR solo dopo i test (o subito se SKIP_TESTS è attivo)
+                sh 'mvn package -DskipTests'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER .'
@@ -67,7 +80,8 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
                     sh '''
-                        echo "$PASS" | docker login registry.example.com -u "$USER" --password-stdin
+                        # echo "$PASS" | docker login registry.example.com -u "$USER" --password-stdin
+                        echo "$PASS" | docker login -u "$USER" --password-stdin
                         docker push $IMAGE_NAME:$BUILD_NUMBER
                     '''
                 }
