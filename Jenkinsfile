@@ -95,13 +95,18 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                // Aggiorna il deployment Kubernetes con la nuova immagine e il relativo build number.
-                // Kubernetes esegue poi il rollout; lo stato si verifica con: kubectl rollout status
-                sh 'kubectl set image deployment/sysfoo sysfoo=$IMAGE_NAME:$BUILD_NUMBER'
+    stage('Deploy') {
+        steps {
+            withCredentials([file(credentialsId: 'kubeconfig-docker-desktop', variable: 'KUBECONFIG')]) {
+                sh '''
+                    kubectl config current-context
+                    kubectl get nodes
+                    kubectl set image deployment/sysfoo sysfoo=$IMAGE_NAME:$BUILD_NUMBER
+                    kubectl rollout status deployment/sysfoo --timeout=120s
+                '''
             }
         }
+    }
     }
 
     post {
