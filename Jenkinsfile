@@ -1,5 +1,7 @@
 pipeline {
-    agent { label 'docker' }
+    // Alternativa: agent { label 'docker' } — esegue la pipeline su un agent Jenkins con Docker
+    // installato, utile per gli stage di build/push dell'immagine senza dipendere dal nodo master.
+    agent any
 
     options {
         // Aggiunge il timestamp alle righe della console output della pipeline
